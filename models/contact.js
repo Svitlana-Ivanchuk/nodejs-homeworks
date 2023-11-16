@@ -1,14 +1,14 @@
 const { Schema, model } = require("mongoose");
 const Joi = require("joi");
 
-const { HttpError, handleMongooseError } = require("../helpers");
+const { handleMongooseError } = require("../middlewares");
 const phoneRegexp = /^\(\d{3}\)\s\d{3}-\d{4}/;
 
 const contactSchema = new Schema(
   {
     name: {
       type: String,
-      required: true,
+      required: [true, "Set name for contact"],
     },
     email: {
       type: String,
@@ -36,8 +36,13 @@ const addSchema = Joi.object({
   favorite: Joi.boolean(),
 });
 
+const updateFavoriteSchema = Joi.object({
+  favorite: Joi.boolean().required(),
+});
+
 const schemas = {
   addSchema,
+  updateFavoriteSchema,
 };
 
 const Contact = model("Contact", contactSchema);

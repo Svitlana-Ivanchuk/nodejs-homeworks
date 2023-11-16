@@ -1,8 +1,8 @@
-const { Contact, schemas } = require("../models/contact");
+const { Contact } = require("../models/contact");
 
 const { HttpError } = require("../helpers");
 
-async function getContacts(req, res, next) {
+async function getContacts(_, res, next) {
   try {
     const result = await Contact.find().exec();
     res.status(200).json(result);
@@ -27,10 +27,6 @@ async function getContactById(req, res, next) {
 
 async function createContact(req, res, next) {
   try {
-    const { error } = addSchema.validate(req.body);
-    if (error) {
-      throw HttpError(400, error.message);
-    }
     const newContact = await Contact.create(req.body);
     res.status(201).json(newContact);
   } catch (error) {
@@ -38,43 +34,50 @@ async function createContact(req, res, next) {
   }
 }
 
-function updateContact(req, res, next) {
-  const { contactId } = req.params;
+async function updateContact(req, res, next) {
+  try {
+    const { contactId } = req.params;
+    const contactById = await Contact.findByIdAndUpdate(contactId, req.body, {
+      new: true,
+    });
+    if (!contactById) {
+      throw HttpError(404, "Not found");
+    }
+    res.json(contactById);
+  } catch (error) {
+    next(error);
+  }
 }
 
-// router.put("/:contactId", async (req, res, next) => {
-//  try {
-//    const { error } = addSchema.validate(req.body);
-//    if (error) {
-//      throw HttpError(400, error.message);
-//    }
-//    const { contactId } = req.params;
-//    const contactById = await contacts.updateContact(contactId, req.body);
-//    if (!contactById) {
-//      throw HttpError(404, "Not found");
-//    }
-//    res.json(contactById);
-//  } catch (error) {
-//    next(error);
-//  }
-// });
+async function updateStatusContact(req, res, next) {
+  try {
+    const { contactId } = req.params;
+    const contactById = await Contact.findByIdAndUpdate(contactId, req.body, {
+      new: true,
+    });
+    if (!contactById) {
+      throw HttpError(404, "Not found");
+    }
+    res.json(contactById);
+  } catch (error) {
+    next(error);
+  }
+}
 
-function removeContact(req, res, next) {}
-
-// router.delete("/:contactId", async (req, res, next) => {
-//  try {
-//    const { contactId } = req.params;
-//    const contact = await contacts.removeContact(contactId);
-//    if (!contact) {
-//      throw HttpError(404, "Not found");
-//    }
-//    res.status(200).json({
-//      message: "Contact deleted",
-//    });
-//  } catch (error) {
-//    next(error);
-//  }
-// });
+async function removeContact(req, res, next) {
+  try {
+    const { contactId } = req.params;
+    const contact = await Contact.findByIdAndDelete(contactId);
+    if (!contact) {
+      throw HttpError(404, "Not found");
+    }
+    res.status(200).json({
+      message: "Contact deleted",
+    });
+  } catch (error) {
+    next(error);
+  }
+}
 
 module.exports = {
   getContacts,
@@ -82,4 +85,5 @@ module.exports = {
   createContact,
   updateContact,
   removeContact,
+  updateStatusContact,
 };
