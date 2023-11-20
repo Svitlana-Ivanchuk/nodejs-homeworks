@@ -23,7 +23,11 @@ const userSchema = new Schema(
       enum: subscriptList,
       default: "starter",
     },
-    //token: String,
+    owner: {
+      type: Schema.Types.ObjectId,
+      ref: "user",
+    },
+    token: String,
   },
   { versionKey: false, timestamps: true }
 );
@@ -36,7 +40,6 @@ const registerSchema = Joi.object({
   subscription: Joi.string()
     .valid(...subscriptList)
     .required(),
-  //token: Joi.string().required(),
 });
 
 const loginSchema = Joi.object({
@@ -45,7 +48,6 @@ const loginSchema = Joi.object({
   subscription: Joi.string()
     .valid(...subscriptList)
     .required(),
-  //token: Joi.string().required(),
 });
 
 const schemas = {
