@@ -1,7 +1,7 @@
 const { Schema, model } = require("mongoose");
 const Joi = require("joi");
 
-const { handleMongooseError } = require("../middlewares");
+const { handleMongooseError } = require("../helpers");
 
 const subscriptList = ["starter", "pro", "business"];
 
@@ -15,7 +15,6 @@ const userSchema = new Schema(
     email: {
       type: String,
       required: [true, "Email is required"],
-
       unique: true,
     },
     subscription: {
@@ -23,11 +22,11 @@ const userSchema = new Schema(
       enum: subscriptList,
       default: "starter",
     },
-    owner: {
-      type: Schema.Types.ObjectId,
-      ref: "user",
+
+    token: {
+      type: String,
+      default: "",
     },
-    token: String,
   },
   { versionKey: false, timestamps: true }
 );
@@ -49,12 +48,21 @@ const loginSchema = Joi.object({
     .valid(...subscriptList)
     .required(),
 });
+const updateSubscriptionSchema = Joi.object({
+  subscription: Joi.string()
+    .valid(...subscriptList)
+    .required(),
+});
 
 const schemas = {
   registerSchema,
   loginSchema,
+  updateSubscriptionSchema,
 };
 
-const User = model("User", userSchema);
+const User = model("user", userSchema);
 
-module.exports = { User, schemas };
+module.exports = {
+  User,
+  schemas,
+};

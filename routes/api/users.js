@@ -4,7 +4,7 @@ const router = express.Router();
 
 const AuthController = require("../../controllers/auth");
 
-const { validateBody } = require("../../middlewares");
+const { validateBody, authenticate } = require("../../middlewares");
 const { schemas } = require("../../models/user");
 
 router.post(
@@ -14,5 +14,11 @@ router.post(
 );
 
 router.post("/login", validateBody(schemas.loginSchema), AuthController.login);
+
+router.get("/current", authenticate, AuthController.getCurrent);
+
+router.post("/logout", authenticate, AuthController.logout);
+
+router.patch("/:userId", authenticate, AuthController.updateSubscription);
 
 module.exports = router;
