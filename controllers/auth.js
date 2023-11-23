@@ -78,9 +78,9 @@ async function logout(req, res, next) {
 
 async function updateSubscription(req, res, next) {
   try {
-    const { userId } = req.params;
-    const user = await User.findByIdAndUpdate(userId, req.body).exec();
-    if (!userId) {
+    const { _id } = req.user;
+    const user = await User.findByIdAndUpdate(_id, req.body).exec();
+    if (!_id) {
       throw HttpError(404, "Not found");
     }
     res.json(user);
