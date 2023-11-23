@@ -21,12 +21,17 @@ async function getContactById(req, res, next) {
   const { contactId } = req.params;
 
   try {
-    const { _id: owner } = req.user;
     const contact = await Contact.findById(contactId).exec();
     if (!contact) {
       throw HttpError(404, "Not found");
     }
-    if (contact.owner !== owner) {
+    const owner = req.user.id;
+    const contactOwner = contact.owner.toHexString();
+
+    //console.log(owner);
+    //console.log(contactOwner);
+
+    if (owner !== contactOwner) {
       throw HttpError(404, "Not found");
     }
 
