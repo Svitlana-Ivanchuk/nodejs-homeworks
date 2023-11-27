@@ -18,10 +18,9 @@ async function register(req, res, next) {
 
     const hashPassword = await bcrypt.hash(password, 10);
     const newUser = await User.create({ ...req.body, password: hashPassword });
-    res
-      .status(201)
-      .json(newUser)
-      .send({ message: "Registration successfully" });
+    const { subscription } = newUser;
+
+    res.status(201).json({ user: { email, subscription } });
   } catch (error) {
     next(error);
   }
@@ -29,7 +28,7 @@ async function register(req, res, next) {
 
 async function login(req, res, next) {
   const { email, password } = req.body;
-  console.log(req.user);
+
   try {
     const user = await User.findOne({ email }).exec();
     if (!user) {
@@ -47,7 +46,8 @@ async function login(req, res, next) {
 
     const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "23h" });
     await User.findByIdAndUpdate(user._id, { token });
-    res.json({ token });
+    const { subscription } = user;
+    res.json({ token, user: { email, subscription } });
   } catch (error) {
     next(error);
   }
@@ -55,11 +55,11 @@ async function login(req, res, next) {
 
 async function getCurrent(req, res, next) {
   try {
-    const { email, token } = req.user;
+    const { email, subscription } = req.user;
     console.log(req.user);
     res.json({
       email,
-      token,
+      subscription,
     });
   } catch (error) {
     next(error);
@@ -79,11 +79,14 @@ async function logout(req, res, next) {
 async function updateSubscription(req, res, next) {
   try {
     const { _id } = req.user;
-    const user = await User.findByIdAndUpdate(_id, req.body).exec();
+    const user = await User.findByIdAndUpdate(_id, req.body, {
+      new: true,
+    }).exec();
     if (!_id) {
       throw HttpError(404, "Not found");
     }
-    res.json(user);
+    const { email, subscription } = user;
+    res.json({ email, subscription });
   } catch (error) {
     next(error);
   }

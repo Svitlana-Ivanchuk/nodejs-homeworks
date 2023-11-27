@@ -2,10 +2,10 @@ const express = require("express");
 
 const router = express.Router();
 
-const AuthController = require("../../controllers/auth");
+const AuthController = require("../controllers/auth");
 
-const { validateBody, authenticate } = require("../../middlewares");
-const { schemas } = require("../../models/user");
+const { validateBody, authenticate } = require("../middlewares");
+const { schemas } = require("../models/user");
 
 router.post(
   "/register",
