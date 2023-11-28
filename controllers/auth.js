@@ -1,5 +1,6 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const fs = require("node:fs/promises");
 
 const { User } = require("../models/user");
 
@@ -92,10 +93,21 @@ async function updateSubscription(req, res, next) {
   }
 }
 
+async function uploadAvatar(req, res, next) {
+  try {
+    console.log(req.file);
+
+    res.send({ message: "Avatar upload" });
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   register,
   login,
   getCurrent,
   logout,
   updateSubscription,
+  uploadAvatar,
 };

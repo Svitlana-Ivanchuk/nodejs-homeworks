@@ -22,8 +22,11 @@ const userSchema = new Schema(
       enum: subscriptList,
       default: "starter",
     },
-
     token: {
+      type: String,
+      default: "",
+    },
+    avatars: {
       type: String,
       default: "",
     },

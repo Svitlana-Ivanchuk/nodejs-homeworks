@@ -1,21 +1,24 @@
+require("dotenv").config();
 const express = require("express");
 const logger = require("morgan");
 const cors = require("cors");
-require("dotenv").config();
+const path = require("node:path");
 
 const usersRouter = require("./routes/users");
-const ContactRouter = require("./routes/contacts");
+const contactRouter = require("./routes/contacts");
 
 const app = express();
 
 const formatsLogger = app.get("env") === "development" ? "dev" : "short";
+
+app.use("/avatars", express.static(path.join(__dirname, "public", "avatars")));
 
 app.use(logger(formatsLogger));
 app.use(cors());
 app.use(express.json());
 
 app.use("/users", usersRouter);
-app.use("/api/contacts", ContactRouter);
+app.use("/api/contacts", contactRouter);
 
 app.use((_, res) => {
   res.status(404).json({ message: "Not found" });
