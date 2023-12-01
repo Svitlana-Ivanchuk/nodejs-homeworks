@@ -2,7 +2,6 @@ require("dotenv").config();
 const express = require("express");
 const logger = require("morgan");
 const cors = require("cors");
-const path = require("node:path");
 
 const usersRouter = require("./routes/users");
 const contactRouter = require("./routes/contacts");
