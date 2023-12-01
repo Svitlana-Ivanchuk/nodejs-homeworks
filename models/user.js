@@ -22,8 +22,11 @@ const userSchema = new Schema(
       enum: subscriptList,
       default: "starter",
     },
-
     token: {
+      type: String,
+      default: "",
+    },
+    avatarURL: {
       type: String,
       default: "",
     },
@@ -36,17 +39,11 @@ userSchema.post("save", handleMongooseError);
 const registerSchema = Joi.object({
   password: Joi.string().min(6).required(),
   email: Joi.string().required(),
-  subscription: Joi.string()
-    .valid(...subscriptList)
-    .required(),
 });
 
 const loginSchema = Joi.object({
   password: Joi.string().min(6).required(),
   email: Joi.string().required(),
-  subscription: Joi.string()
-    .valid(...subscriptList)
-    .required(),
 });
 
 const updateSubscriptionSchema = Joi.object({
