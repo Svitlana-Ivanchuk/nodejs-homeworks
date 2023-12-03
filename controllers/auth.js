@@ -105,7 +105,6 @@ async function updateSubscription(req, res, next) {
 
 async function updateAvatar(req, res, next) {
  try {
-  console.log(req.file);
   const { _id } = req.user;
   const { path: tempUpload, filename } = req.file;
   const resultUpload = path.join(avatarsDir, filename);
