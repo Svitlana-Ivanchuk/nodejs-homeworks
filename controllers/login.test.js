@@ -1,58 +1,71 @@
-require("dotenv").config();
-
 const mongoose = require("mongoose");
 const supertest = require("supertest");
+const {
+ beforeAll,
+ afterAll,
+ describe,
+ expect,
+ test,
+} = require("@jest/globals");
 const app = require("../app");
 const { User } = require("../models/user");
+require("dotenv").config();
 
-const DB_TEST_URI = process.env.DB_TEST_URI;
+const { DB_TEST_URI } = process.env;
+const newUser = {
+ email: "olga2@gmail.com",
+ password: "123456",
+};
 
 mongoose.set("strictQuery", true);
-let user;
 
-beforeAll(async () => {
- await mongoose.connect(DB_TEST_URI);
- await User.deleteMany();
+describe("register/login", () => {
+ beforeAll(async () => {
+  await mongoose.connect(DB_TEST_URI);
+  await User.deleteMany();
+ });
 
- const user = new User({ email: "olga@gmail.com", password: "123456" });
- await user.save();
-
- //console.log(user);
- //userId = user._id;
-});
-
-describe("login", () => {
- //let userId;
+ test("should create new user and return status code 201", async () => {
+  const response = await supertest(app).post("/users/register").send(newUser);
+  expect(response.statusCode).toBe(201);
+ });
 
  test("should return response status code 200", async () => {
-  const res = await supertest(app).post("/users/login").send({
-   email: "olga@gmail.com",
-   password: "123456",
-  });
+  const response = await supertest(app).post("/users/login").send(newUser);
+  expect(response.statusCode).toBe(200);
+ });
 
-  expect(res.statusCode).toBe(200);
-  expect(res.body.data.user.email).toBe("olga@gmail.com");
+ test("should return user object with 2 fields email and subscription with data type String", async () => {
+  const response = await supertest(app).post("/users/login").send(newUser);
+  expect(response.body.user.email).toBe(newUser.email);
+  expect(response.body.user.subscription).toBe(
+   "starter" || "pro" || "business"
+  );
+  expect(response.body.user).toEqual({
+   email: expect.any(String),
+   subscription: expect.any(String),
+  });
  });
 
  test("should return response token", async () => {
-  const res = await supertest(app).post("/users/login").send({
-   email: "olga@gmail.com",
-   password: "123456",
-  });
+  const response = await supertest(app).post("/users/login").send(newUser);
+  expect(response.body.token).toBeTruthy();
+ });
 
-  //const user = await User.findById(userId);
-
-  expect(res.body.token).toBeDefined();
+ test("should return response status code 409 if the mail is already registered", async () => {
+  await supertest(app).post("/users/register").send(newUser);
+  const response = await supertest(app).post("/users/register").send(newUser);
+  expect(response.statusCode).toBe(409);
  });
 
  test("should return response status code 401 for unsuccessful login", async () => {
-  const res = await supertest(app)
+  const response = await supertest(app)
    .post("/users/login")
-   .send({ email: "olga@gmail.com", password: "incorrectPassword" });
-
-  expect(res.statusCode).toBe(401);
+   .send({ email: "anna@gmail.com", password: "1234567" });
+  expect(response.statusCode).toBe(401);
  });
-});
-afterAll(async () => {
- await mongoose.connection.close();
+
+ afterAll(async () => {
+  await mongoose.disconnect(DB_TEST_URI);
+ });
 });
