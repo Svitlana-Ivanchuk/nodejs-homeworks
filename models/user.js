@@ -45,17 +45,29 @@ const userSchema = new Schema(
 userSchema.post("save", handleMongooseError);
 
 const registerSchema = Joi.object({
- password: Joi.string().min(6).required(),
- email: Joi.string().required(),
+ password: Joi.string()
+  .min(6)
+  .required()
+  .error(new Error("Missing required field password")),
+ email: Joi.string()
+  .required()
+  .error(new Error("Missing required field email")),
 });
 
 const emailSchema = Joi.object({
- email: Joi.string().required(),
+ email: Joi.string()
+  .required()
+  .error(new Error("Missing required field email")),
 });
 
 const loginSchema = Joi.object({
- password: Joi.string().min(6).required(),
- email: Joi.string().required(),
+ email: Joi.string()
+  .required()
+  .error(new Error("Missing required field email")),
+ password: Joi.string()
+  .min(6)
+  .required()
+  .error(new Error("Missing required field password")),
 });
 
 const updateSubscriptionSchema = Joi.object({
@@ -65,9 +77,7 @@ const updateSubscriptionSchema = Joi.object({
 });
 
 const updateAvatar = Joi.object({
- avatarURL: Joi.string()
-  .required()
-  .messages({ "string.empty": "Nothing to update" }),
+ avatarURL: Joi.string().required().error(new Error("Nothing to update")),
 });
 
 const schemas = {

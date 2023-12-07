@@ -37,7 +37,8 @@ async function register(req, res, next) {
   const verifyEmail = {
    to: email,
    subject: "Verify email",
-   html: `<a target="-blank" href="${BASE_URL}/users/verify/${verificationToken}">Click verify your email</a>`,
+   html: `<h1>To confirm your registration please click on the <a href="${BASE_URL}/users/verify/${verificationToken}">link</a></h1>`,
+   text: `<h1>To confirm your registration please open the link ${BASE_URL}/users/verify/${verificationToken} </h1>`,
   };
 
   await sendEmail(verifyEmail);
@@ -74,12 +75,13 @@ async function resendVerifyEmail(req, res, next) {
  const { email } = req.body;
  try {
   const user = await User.findOne({ email });
+  console.log(user.email);
 
   if (!user) {
    throw HttpError(401, "User not found");
   }
   if (user.verify === true) {
-   throw HttpError(404, "Verification has already been passed");
+   throw HttpError(400, "Verification has already been passed");
   }
   console.log(user);
   const verifyEmail = {
