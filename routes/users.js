@@ -14,6 +14,14 @@ router.post(
  AuthController.register
 );
 
+router.get("/verify/:verificationToken", AuthController.verifyEmail);
+
+router.post(
+ "/verify",
+ validateBody(schemas.emailSchema),
+ AuthController.resendVerifyEmail
+);
+
 router.post("/login", validateBody(schemas.loginSchema), AuthController.login);
 
 router.get("/current", authenticate, AuthController.getCurrent);
@@ -35,11 +43,6 @@ router.patch(
  AuthController.updateAvatar
 );
 
-router.get(
- "/avatars",
- authenticate,
-
- AuthController.getAvatar
-);
+router.get("/avatars", authenticate, AuthController.getAvatar);
 
 module.exports = router;
